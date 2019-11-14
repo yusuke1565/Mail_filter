@@ -1,17 +1,17 @@
 #python kadai6.py training.txt
 #Count word in training.txt
 
-# -*- coding: utf-8 -*-
 import MeCab
 import sys
+
 args=sys.argv
 mecab=MeCab.Tagger("-Owakati")
+
 file=args[1]
-
 with open(file,"r") as f:
-    a=f.read()
-    words=mecab.parse(a).split(' ')
+    text = f.read()
+    words = mecab.parse(text).split(' ')
 
-count=len(words)
+fleq = len(words)
 
-print "word count:",count
+print "word count:",fleq
