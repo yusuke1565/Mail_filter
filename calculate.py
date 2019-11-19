@@ -21,11 +21,9 @@ with open(file,'r') as f:
         words = mecab.parse(line).split(' ')
         if text[0] == 'S':
             for word in words:
-                Swords.append(word)
                 Sword2fleq[word] = Sword2fleq.get(word,0) +1
         elif text[0] =='N':
             for word in words:
-                Nwords.append(word)
                 Nword2fleq[word] = Nword2fleq.get(word,0) +1
 
 pS = float(Sword2fleq['S']) / float(mailLen)
@@ -33,14 +31,18 @@ pN = float(Nword2fleq['N']) / float(mailLen)
 
 Sword2cal={}
 Nword2cal={}
-SwordLen = len(Swords)
-NwordLen = len(Nwords)
+SwordLen=0
+NwordLen=0
+for fleq in Sword2fleq.values():
+    SwordLen += fleq
+for fleq in Nword2fleq.values():
+    NwordLen += fleq
 
 for Sword in Sword2fleq.keys():
     Sword2cal[Sword] = float(Sword2fleq[Sword]) / float(SwordLen)
-
 for Nword in Nword2fleq.keys():
     Nword2cal[Nword] = float(Nword2fleq[Nword]) / float(NwordLen)
+
 
 with open('pSpN.txt',"w") as f:
     f.write(str(pS) + "\n")
