@@ -25,6 +25,8 @@ with open(file,'r') as f:
         elif text[0] =='N':
             for word in words:
                 Nword2fleq[word] = Nword2fleq.get(word,0) +1
+Sword2fleq.pop("\n")
+Nword2fleq.pop("\n")
 
 pS = float(Sword2fleq['S']) / float(mailLen)
 pN = float(Nword2fleq['N']) / float(mailLen)
