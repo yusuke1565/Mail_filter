@@ -1,25 +1,35 @@
 #python kadai7_1.py training.txt
 #Ask probability for calculate
 
-def return_Label(line):
-    L = line.split(",")
-    return L[0]
+import MeCab
+import sys
+
+args = sys.argv
+mecab = MeCab.Tagger('-Owakati')
 
 
-def countWord_perLabel(L,line,L2w2f):  #return fleq word per label
-    line = line.rstrip()
-    line = mecab.parse(line)
-    words = line.split(" ")
+def detach_Label(line):
+    L,sentence = line.split(",")
+    return L[0],sentence
+
+
+def make_word2freq(sentence):  #return word2freq
+    w2f={}
+    sentence = sentence.rstrip()
+    words = mecab.parse(sentence).split(" ")
     for word in words:
-        L2w2f[L][word] = L2w2f[L].get(word, 0) + 1
-    return L2w2f
+        w2f[word] = w2f.get(word,0) +1
+    return w2f
 
 
-def calculate_pL(L2f,mailLen): #calculate probability of label
-    L2cal={}
+def calculate_pL(L2f): #calculate probability of label
+    L2prob={}
+    mailLen=0
+    for freq in L2f.values():
+        mailLen += freq
     for L in L2f.keys():
-        L2cal[L] = float(L2f[L]) / float(mailLen)
-    return L2cal
+        L2prob[L] = float(L2f[L]) / float(mailLen)
+    return L2prob
 
 
 def calculate_pw(L2w2f):  #calculate probability of word
@@ -46,30 +56,29 @@ def write_pw(L2w2pw):
             for word in L2w2pw[L].keys():
                 f.write(L + " " + word + " " + str(L2w2pw[L][word]) + "\n")
 
+def main():
+    file = args[1]
+    w2f={}
+    L2f={}  #label2fleq
+    L2w2f={}  #label2word2fleq
+    with open(file,'r') as file:
+        for line in file:
+            L , sentence = detach_Label(line)
+            L2f[L] = L2f.get(L,0) +1  #count label
+            L2w2f[L] = L2w2f.get(L,{})  #define two dimensions dictionary
+            w2f =  make_word2freq(sentence)
+            for word in w2f.keys():
+                L2w2f[L][word] = L2w2f[L].get(word,0) + w2f[word]
 
-import MeCab
-import sys
+    for L in L2w2f:  #\n is cause of the error
+        L2w2f[L].pop("\n")
 
-args = sys.argv
-mecab = MeCab.Tagger('-Owakati')
+    L2pL = calculate_pL(L2f)  #pl=pS,pN,...
+    L2w2pw = calculate_pw(L2w2f)  #pw=p(w|S),p(w|N),...
 
-file = args[1]
-L2f={}  #label2fleq
-L2w2f={}  #label2word2fleq
-mailLen=0
-with open(file,'r') as file:
-    for line in file:
-        L = return_Label(line)
-        L2f[L] = L2f.get(L,0) +1  #count label
-        L2w2f[L] = L2w2f.get(L,{})  #define two dimensions dictionary
-        L2w2f = countWord_perLabel(L,line,L2w2f)
-        mailLen+=1
+    write_pL(L2pL)
+    write_pw(L2w2pw)
 
-for L in L2w2f:  #cause of the error
-    L2w2f[L].pop("\n")
 
-L2pL = calculate_pL(L2f,mailLen)  #pl=pS,pN,...
-L2w2pw = calculate_pw(L2w2f)  #pw=p(w|S),p(w|N),...
-
-write_pL(L2pL)
-write_pw(L2w2pw)
+if __name__ == "__main__":
+    main()
