@@ -8,19 +8,24 @@ args = sys.argv
 mecab = MeCab.Tagger('-Owakati')
 
 
-def detach_Label(line):
-    label,sentence = line.split(",",1)
-    return label,sentence
+def detach_label(line):
+    label, mail = line.split(",",1)
+    return label, mail
 
 
-def make_word2freq(sentence):  #return word2freq
-    w2f={}
-    sentence = sentence.rstrip()
-    words = mecab.parse(sentence).split(" ")
+def count_label(label, label2freq):
+    label2freq[label] = label2freq.get(label, 0) + 1
+    return label2freq
+
+
+def count_by_label(label, mail, label2w2f):
+    w2f = {}
+    words = mecab.parse(mail).split(" ")
     for word in words:
-        w2f[word] = w2f.get(word,0) +1
-    return w2f
-
+        w2f[word] = w2f.get(word, 0) + 1
+    for word in w2f.keys():
+        label2w2f[label][word] = label2w2f[label].get(word, 0) + w2f[word]
+    return label2w2f
 
 def calculate_pLabel(label2f): #calculate probability of label
     label2prob={}
@@ -44,31 +49,29 @@ def calculate_pw(label2w2f):  #calculate probability of word
     return label2w2cal
 
 
-def write_pLabel(label2pLabel):
-    with open('pLabel.txt', "w") as f:
+def write_pLabel(label2pLabel, write_file = 'A'):
+    with open(write_file, "w") as f:
         for label in label2pLabel.keys():
             f.write(label + " " + str(label2pLabel[label]) + "\n")
 
 
-def write_pw(label2w2pw):
-    with open('pw_Label.txt', "w") as f:
+def write_pw(label2w2pw, write_file = 'B'):
+    with open(write_file, "w") as f:
         for label in label2w2pw.keys():
             for word in label2w2pw[label].keys():
                 f.write(label + " " + word + " " + str(label2w2pw[label][word]) + "\n")
 
 def main():
     file = args[1]
-    w2f={}
     label2f={}  #label2fleq
     label2w2f={}  #label2word2fleq
     with open(file,'r') as file:
         for line in file:
-            label , sentence = detach_Label(line)
-            label2f[label] = label2f.get(label,0) +1  #count label
-            label2w2f[label] = label2w2f.get(label,{})  #define two dimensions dictionary
-            w2f =  make_word2freq(sentence)
-            for word in w2f.keys():
-                label2w2f[label][word] = label2w2f[label].get(word,0) + w2f[word]
+            line = line.rstrip()
+            label , mail = detach_label(line)
+            label2f = count_label(label, label2f)
+            label2w2f[label] = label2w2f.get(label, {})  #define two dimensions dictionary
+            label2w2f = count_by_label(label, mail, label2w2f)
 
     for label in label2w2f:  #\n is cause of the error
         label2w2f[label].pop("\n")
@@ -76,8 +79,8 @@ def main():
     label2pLabel = calculate_pLabel(label2f)  #pl=pS,pN,...
     label2w2pw = calculate_pw(label2w2f)  #pw=p(w|S),p(w|N),...
 
-    write_pLabel(label2pLabel)
-    write_pw(label2w2pw)
+    write_pLabel(label2pLabel, write_file = 'pLabel.txt')
+    write_pw(label2w2pw, write_file = 'pw_label.txt')
 
 
 if __name__ == "__main__":
