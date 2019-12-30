@@ -65,8 +65,8 @@ def main():
     file = args[1]
     label2f={}  #label2fleq
     label2w2f={}  #label2word2fleq
-    with open(file,'r') as file:
-        for line in file:
+    with open(file,'r') as f:
+        for line in f:
             line = line.rstrip()
             label , mail = detach_label(line)
             label2f = count_label(label, label2f)
