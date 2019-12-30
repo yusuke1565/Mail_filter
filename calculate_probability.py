@@ -18,7 +18,7 @@ def count_label(label, label2freq):
     return label2freq
 
 
-def count_by_label(label, mail, label2w2f):
+def count_word_by_label(label, mail, label2w2f):
     w2f = {}
     words = mecab.parse(mail).split(" ")
     for word in words:
@@ -71,7 +71,7 @@ def main():
             label , mail = detach_label(line)
             label2f = count_label(label, label2f)
             label2w2f[label] = label2w2f.get(label, {})  #define two dimensions dictionary
-            label2w2f = count_by_label(label, mail, label2w2f)
+            label2w2f = count_word_by_label(label, mail, label2w2f)
 
     for label in label2w2f:  #\n is cause of the error
         label2w2f[label].pop("\n")
