@@ -81,6 +81,7 @@ class Second_dimention_dic_for_freq:
     def __init__(self, closing = None, key2freq = {}):
         """
         Define dictionary(closing2key2frequency) and go 'set data'.
+        closing2key2frequency is closing to key, key to frequency.
         :param closing(real or char): Close somethings.
                                       Example, label or category.
         :param key2freq(dictionary): Dictionary for frequency.
@@ -140,20 +141,36 @@ class Dictionary_for_prob:
         return self.k2p
 
 
-class Two_dimentions_dic_for_prob:
+class Second_dimention_dic_for_prob:
+    """
+    This class make secound dimention dictionary for prob.
+    """
     def __init__(self, closing2key2freq = {}):
+        """
+        Define dictionary(closing2key2probability) and go 'set data'.
+        closing2key2probability is closing to key, key to probability.
+        :param closing2key2freq(dictionary): Closing to key. Key to frequency.
+        """
         c2k2f = closing2key2freq
         self.c2k2p = {}
         self.set_data(c2k2f)
 
     # ----------------------------------------#
     def set_data(self, c2k2f = {}):
+        """
+        Set data in c2k2p.
+        :param c2k2f(dictionary): Closing to key. Key to frequency.
+        """
         for c in c2k2f.keys():
             self.c2k2p[c] = {}
             for k in c2k2f[c].keys():
                 self.c2k2p[c][k] = float(c2k2f[c][k]) / float(len(c2k2f[c]))
 
     def get_dic(self):
+        """
+        Return c2k2p.
+        :return: Second dimention dictionary for prob.
+        """
         return self.c2k2p
 
 
