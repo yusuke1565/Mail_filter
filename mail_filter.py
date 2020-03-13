@@ -47,7 +47,7 @@ def calculate_prob(test_w2f, pL, w2pw):  #calculate probability to judge mail
 
 def main():
     label2pLabel = read_pLabel(read_file = "pLabel.txt")
-    label2w2pw = read_pw(read_file = "pw_label.txt")
+    label2w2pw = read_pw(read_file = "pw_Label.txt")
 
     test_file = args[1]
     NofMail=0
@@ -57,7 +57,7 @@ def main():
     with open(test_file,"r") as file:
         for line in file:
             NofMail+=1
-            test_label , test_mail = calculate_probability.detach_label(line)
+            test_label , test_mail = calculate_probability.detach_Label(line)
             test_w2f = count_word(test_mail)
 
             label2p={}
