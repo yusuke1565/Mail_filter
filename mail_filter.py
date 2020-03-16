@@ -10,7 +10,7 @@ args = sys.argv
 mecab = MeCab.Tagger('-Owakati')
 
 
-def read_pLabel(read_file = "A"):  #pS,pN,...
+def read_pLabel(read_file="A"):  #pS,pN,...
     with open(read_file, "r") as f:
         label2pLabel = {}
         for line in f:
@@ -20,7 +20,7 @@ def read_pLabel(read_file = "A"):  #pS,pN,...
     return label2pLabel
 
 
-def read_pw(read_file = "B"):  #p(w|S),p(w|N),...
+def read_pw(read_file="B"):  #p(w|S),p(w|N),...
     with open(read_file,"r") as f:
         label2w2pw={}
         for line in f:
@@ -54,7 +54,7 @@ def main():
     match=0
     NofJudge_S = 0
     NofTest_label_S = 0
-    with open(test_file,"r") as file:
+    with open(test_file, "r") as file:
         for line in file:
             NofMail+=1
             test_label , test_mail = calculate_probability.detach_Label(line)
