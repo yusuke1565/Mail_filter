@@ -1,94 +1,87 @@
-#python kadai7_2.py test.txt
-#judge spam mail
+# Categorize mail.
 
 import sys
 import MeCab
 import math
-import calculate_probability
+from make_db import make_db_mail_filter
 
 args = sys.argv
 mecab = MeCab.Tagger('-Owakati')
 
 
-def read_pLabel(read_file="A"):  #pS,pN,...
-    with open(read_file, "r") as f:
-        label2pLabel = {}
-        for line in f:
-            line = line.rstrip()
-            labelW = line.split(" ")
-            label2pLabel[labelW[0]] = labelW[1]
-    return label2pLabel
+def load_db(db="training.db"):
+    """
+    Load database and make label2word2freq and label2prob.
+    :param db(database): Training data.
+    :return label2w2p(dictionary): Label to word to probability.
+            label2p(dictionary): Label to probability.
+    """
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+
+    lable2w2p = {}
+    for row1 in c.execute('SELECT * FROM word_prob'):
+        # Set data label2w2p
+        label, word, prob = row1[0], row1[1], row1[2]
+        label2w2p[lable] = lable2w2p.get(lable, {})
+        label2w2p[label][word] = prob
+
+    for row2 in c.execute('SELECT * FROM label_prob'):
+        # Set data label2p
+        label, prob = row2[0], row[1]
+        label2p[label] = prob
+    c.commit()
+    c.close()
+    return label2w2p, label2p
 
 
-def read_pw(read_file="B"):  #p(w|S),p(w|N),...
-    with open(read_file,"r") as f:
-        label2w2pw={}
-        for line in f:
-            line = line.rstrip()
-            labelWPw = line.split(" ")
-            label2w2pw[labelWPw[0]] = label2w2pw.get(labelWPw[0],{}) #define two dimentions dictionary
-            label2w2pw[labelWPw[0]][labelWPw[1]] = labelWPw[2]
-    return label2w2pw
-
-def count_word(sentence):  #return word2freq
-    w2f={}
-    sentence = sentence.rstrip()
-    words = mecab.parse(sentence).split(" ")
-    for word in words:
-        w2f[word] = w2f.get(word,0) +1
+def count_word(content):
+    """
+    Count word in content and make word2freq.
+    :param content(char): Words and numbers.
+    :return w2f(dictionary): Word to frequency.
+    """
+    content = content.rstrip()
+    words = mecab.parse(content).split(" ")
+    w2f = make_db_mail_filter.Dic_for_freq(words)
+    w2f = w2f.get_dic()
     return w2f
 
-def calculate_prob(test_w2f, pL, w2pw):  #calculate probability to judge mail
-    ans = math.log(float(pL))
-    for word in test_w2f.keys():
-        ans = ans + math.log( float(w2pw.get(word,0.000000001)) ) * test_w2f[word]
-    return ans
+
+def calculate_prob(test_w2f={}, label_prob=0, word2prob={}):
+    """
+    Calculate probability to categorize mail
+    :param test_w2f(dictionary): Word to frequency in test data.
+    :param label_prob(real): Probability for label.
+    :param word2prob(dictionary): Word to probability in training data.
+    :return p(char): Answer calculation.
+    """
+    p = math.log(float(label_prob))
+    for word, f in test_w2f.items():
+        p = p + math.log(float(word2prob.get(word, 0.000000001))) * f
+    return p
 
 
-def main():
-    label2pLabel = read_pLabel(read_file = "pLabel.txt")
-    label2w2pw = read_pw(read_file = "pw_Label.txt")
+def main(db, content):
+    """
+    Filterize mail.
+    :param db(database): Training data.
+    :param content(char): Words and numbers.
+    :return judge(char): Answer catego
+    """
+    label2w2p, label2p = load_db(db)
 
-    test_file = args[1]
-    NofMail=0
-    match=0
-    NofJudge_S = 0
-    NofTest_label_S = 0
-    with open(test_file, "r") as file:
-        for line in file:
-            NofMail+=1
-            test_label , test_mail = calculate_probability.detach_Label(line)
-            test_w2f = count_word(test_mail)
+    test_w2f = count_word(content)
+    a = -99999999
+    for label, p in label2p.items():
+        ans_p = calculate_prob(test_w2f, label_prob=p,
+                                     word2prob=label2w2p[label])
 
-            label2p={}
-            for label in label2pLabel.keys():
-                label2p[label] = calculate_prob(test_w2f, label2pLabel[label], label2w2pw[label])
+        if a < ans_p:
+            a = ans_p
+            judge = label
 
-            a=-99999999
-            judge=0
-
-            for label in label2p.keys():
-                if a < label2p[label]:
-                    a = label2p[label]
-                    judge = label
-
-            if test_label == 'S':
-                NofTest_label_S+=1
-
-            if judge == 'S':
-                NofJudge_S+=1
-                if judge == test_label:
-                    match+=1
-
-            print(judge)
-
-        print("precision:" + str(match) + "/" + str(NofJudge_S))
-        print("recall:" + str(match) + "/" + str(NofTest_label_S))
-        if NofJudge_S != 0:
-            precision = float(match) / float(NofJudge_S)
-            recall = float(match) / float(NofTest_label_S)
-            F = (2 * precision * recall) / (precision + recall)
-            print("F-measure:" + str(F))
+    return judge
 
 
 if __name__ == "__main__":
