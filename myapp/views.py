@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from myapp.mail_filter import main
 
+
 def filtering(request):
     d = {"kekka":go_ans(request.GET.get('database'),
                       request.GET.get('content'))}

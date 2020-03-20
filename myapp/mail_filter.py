@@ -3,6 +3,7 @@
 import sys
 import MeCab
 import math
+import sqlite3
 from make_db import make_db_mail_filter
 
 args = sys.argv
@@ -19,18 +20,18 @@ def load_db(db="training.db"):
     conn = sqlite3.connect(db)
     c = conn.cursor()
 
-    lable2w2p = {}
+    label2w2p = {}
     for row1 in c.execute('SELECT * FROM word_prob'):
         # Set data label2w2p
         label, word, prob = row1[0], row1[1], row1[2]
-        label2w2p[lable] = lable2w2p.get(lable, {})
+        label2w2p[label] = label2w2p.get(label, {})
         label2w2p[label][word] = prob
 
+    label2p = {}
     for row2 in c.execute('SELECT * FROM label_prob'):
         # Set data label2p
-        label, prob = row2[0], row[1]
+        label, prob = row2[0], row2[1]
         label2p[label] = prob
-    c.commit()
     c.close()
     return label2w2p, label2p
 
