@@ -39,7 +39,7 @@ $ python manage.py runservere
 ![page](./image/page.png)
 
 このようなものが出てくる。
-ここで、教師データベース([詳細](https://github.com/yusuke1565/Mail_filter/make_db/s))と、メール本文を入力すると、
+ここで、教師データベース([詳細](https://github.com/yusuke1565/Mail_filter/tree/master/make_db))と、メール本文を入力すると、
 
 ![page_ans](./image/page_ans.png)
 
