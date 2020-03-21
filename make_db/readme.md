@@ -1,48 +1,29 @@
-# メールフィルタ
-このリポジトリは、メールをスパムメールか否かを分類してくれる、教師付き分類機webアプリケーションである。
+# 教師データの作成
+
+ここでは教師データ作成について記す。
 
 ### 概要
 
-このメールフィルタはナイーブベイズを使用したもので、使用するデータベースとメール本文を入力すると、ラベルを返すものである。
-
-ラベルは、「N」「S」の二つ。(N=Not spam, S=Spam)
-
-
-### 実行要件
-
-python 3.6 以上
-
-Djangoo 1.11.11 以上
-
-mecab 0.996 以上
-
-下記のコードでパッケージをダウンロードできる。
-
-```bash
-pip install -r request/requirements.txt
-```
+教師データは、make_db_mail_filter.py にテキストデータを読み込ませることによって作成される。
 
 
 ### 文法
 
 '''bash
-$ python manage.py runservere
+$ python make_db_mail_filter.py <-.txt> <-.db>
 '''
 
+`<-.txt>`は、事前に用意したデータである。
+`<-.db>`は、作成されるデータベースの名前を決めれる。
+実行すると、<-.db> が作成される。
+(新しくデータベースを作成した場合は、form.html(./myapp/templates/myapp/form.html)を書き換えてください)
 
-### デモ
 
-出力例：
+### テキストデータ
 
-![output](./image/output_image.png)
+今回事前に用意したデータについて説明する。
 
-実行すると上の画像のようなものが現れるので、"'赤丸内のアドレス'/categorization/mailfilter"をwebで検索すると、
+![training_txt](./../image/training.png)
 
-![page](./image/page.png)
-
-このようなものが出てくる。
-ここで、教師データベース([詳細](https://github.com/yusuke1565/Mail_filter/make_db/s))と、メール本文を入力すると、
-
-![page_ans](./image/page_ans.png)
-
-結果が返ってくる。
+上記のように、`<ラベル>,<本文>`　のようになっている。
+(ここのラベルを変えれば、多種多様に変更できる。)
