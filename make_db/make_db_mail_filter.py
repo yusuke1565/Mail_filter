@@ -211,7 +211,8 @@ def main():
     label2w2p = Second_dimention_dic_for_prob(label2w2f)
     label2w2p = label2w2p.get_dic()
 
-    conn = sqlite3.connect("training_mail_filter.db")
+    db_name = args[2]
+    conn = sqlite3.connect(db_name)
     c = conn.cursor()
 
     c.execute('''CREATE TABLE word_prob(label text,
