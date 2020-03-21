@@ -16,17 +16,21 @@ Djangoo 1.11.11 以上
 
 mecab 0.996 以上
 
+下記のコードでパッケージをダウンロードできる。
+
+
+`pip install -r request/requirements.txt`
+
+
 
 ### 文法
 
-'''bash
+```bash
 $ python manage.py runservere
-'''
+```
 
 
 ### デモ
-
-出力例：
 
 ![output](./image/output_image.png)
 
@@ -35,7 +39,7 @@ $ python manage.py runservere
 ![page](./image/page.png)
 
 このようなものが出てくる。
-ここで、教師データベース([詳細](https://github.com/yusuke1565/mail_filter/make_db/))と、メール本文を入力すると、
+ここで、教師データベース([詳細](https://github.com/yusuke1565/Mail_filter/make_db/s))と、メール本文を入力すると、
 
 ![page_ans](./image/page_ans.png)
 
