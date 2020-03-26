@@ -9,13 +9,17 @@
 <h1>メール分類機</h1>
 <p>
 <h3>このページではメールをスパムメールかどうかを判定してくれます。</h3>
-<br>
+（'S'=Spam、'N'=Not spam)
+<br><br>
+
 <form action="" method="get">
 <select name="database">
   <option>使用する教師データベースを選ぶ</option>
   <option value="database/training_mail_filter.db">
-  training_mail_filter.db
+   training_mail_filter.db
   </option>
+  <option value="database/new_training_mail_filter.db">
+   new_training_mail_filter.db</option>
   <!--追加: <option value="database/new.db">new.db</option> -->
 </select>
   <br>メール本文:<input type="text" name="content">

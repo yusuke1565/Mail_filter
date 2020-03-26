@@ -31,7 +31,7 @@ class Mail:
         label, content = line.split(delimiter)
         return label, content
 
-    def get_lable(self):
+    def get_label(self):
         return self.label
 
     def parse_content(self):
@@ -65,8 +65,8 @@ class Dic_for_freq:
         Set data in k2f.
         :param list(list): Real or char.
         """
-        for n in list:
-            self.k2f[n] = self.k2f.get(n, 0) + 1
+        for k in list:
+            self.k2f[k] = self.k2f.get(k, 0) + 1
 
     def get_dic(self):
         """
@@ -76,26 +76,26 @@ class Dic_for_freq:
         return self.k2f
 
 
-class Second_dimention_dic_for_freq:
+class Second_dimension_dic_for_freq:
     """
-    This class make second dimention dictionary for frequency.
+    This class make second dimension dictionary for frequency.
     """
-    def __init__(self, closing=None, key2freq={}):
+    def __init__(self, category=None, key2freq={}):
         """
-        Define dictionary(closing2key2frequency) and go 'set data'.
-        closing2key2frequency is closing to key, key to frequency.
-        :param closing(real or char): Close somethings.
+        Define dictionary(category2key2frequency) and go 'set data'.
+        category2key2frequency is category to key, key to frequency.
+        :param category(real or char): category somethings.
                                       Example, label or category.
         :param key2freq(dictionary): Dictionary for frequency.
         """
         self.c2k2f = {}
-        self.set_data(closing, key2freq)
+        self.set_data(category, key2freq)
 
     # -----------------------------------#
     def set_data(self, c=None, k2f={}):
         """
         Set data in c2k2f.
-        :param c(real or char): Close something.
+        :param c(real or char): category something.
         :param k2f(dictionary): Key to frequency.
         """
         if c:
@@ -106,7 +106,7 @@ class Second_dimention_dic_for_freq:
     def get_dic(self):
         """
         Return c2k2f.
-        :return: Second dimention dictionary for frequency.
+        :return: Second dimension dictionary for frequency.
         """
         return self.c2k2f
 
@@ -143,17 +143,17 @@ class Dic_for_prob:
         return self.k2p
 
 
-class Second_dimention_dic_for_prob:
+class Second_dimension_dic_for_prob:
     """
-    This class make secound dimention dictionary for prob.
+    This class make second dimension dictionary for prob.
     """
-    def __init__(self, closing2key2freq={}):
+    def __init__(self, category2key2freq={}):
         """
-        Define dictionary(closing2key2probability) and go 'set data'.
-        closing2key2probability is closing to key, key to probability.
-        :param closing2key2freq(dictionary): Closing to key. Key to frequency.
+        Define dictionary(category2key2probability) and go 'set data'.
+        category2key2probability is category to key, key to probability.
+        :param category2key2freq(dictionary): category to key. Key to frequency.
         """
-        c2k2f = closing2key2freq
+        c2k2f = category2key2freq
         self.c2k2p = {}
         self.set_data(c2k2f)
 
@@ -161,7 +161,7 @@ class Second_dimention_dic_for_prob:
     def set_data(self, c2k2f={}):
         """
         Set data in c2k2p.
-        :param c2k2f(dictionary): Closing to key. Key to frequency.
+        :param c2k2f(dictionary): category to key. Key to frequency.
         """
         for c in c2k2f.keys():
             self.c2k2p[c] = {}
@@ -171,9 +171,28 @@ class Second_dimention_dic_for_prob:
     def get_dic(self):
         """
         Return c2k2p.
-        :return: Second dimention dictionary for prob.
+        :return: Second dimension dictionary for prob.
         """
         return self.c2k2p
+
+def filter(category2word2freq={}):
+    """
+    If word exist over 10 frequency in all category, delete it.
+    category2word2freq(dictionary): Second dimension dictionary for freq.
+    return (dictionary): Filtered dictionary.
+    """
+    del2f = {}
+    i = 0
+    for category in category2word2freq.keys():
+        i = i + 1
+        for word, freq in category2word2freq[category].items():
+            if freq >= 10:
+                del2f[word] = del2f.get(word, 0) + 1
+    for word, freq in del2f.items():
+        if freq >= i:
+            for category in category2word2freq.keys():
+                 del category2word2freq[category][word]
+    return category2word2freq
 
 
 def main():
@@ -186,7 +205,7 @@ def main():
             line = line.rstrip()
             mail = Mail(line)  # Mail is instance of class 'Mail'.
 
-            label = mail.get_lable()
+            label = mail.get_label()
             labels.append(label)
 
             words = mail.get_words()
@@ -195,7 +214,7 @@ def main():
             del w2f["\n"]  # '\n' cause error because delete it.
 
             if i == 1:  # First contact.
-                label2w2f = Second_dimention_dic_for_freq(label, w2f)
+                label2w2f = Second_dimension_dic_for_freq(label, w2f)
             else:
                 label2w2f.set_data(label, w2f)  # Not first contact.
             del w2f
@@ -204,11 +223,13 @@ def main():
     label2f = label2f.get_dic()
 
     label2w2f = label2w2f.get_dic()
+    label2w2f = filter(label2w2f)
+
 
     label2p = Dic_for_prob(label2f)
     label2p = label2p.get_dic()
 
-    label2w2p = Second_dimention_dic_for_prob(label2w2f)
+    label2w2p = Second_dimension_dic_for_prob(label2w2f)
     label2w2p = label2w2p.get_dic()
 
     db_name = args[2]
